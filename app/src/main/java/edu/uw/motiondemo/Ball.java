@@ -15,7 +15,7 @@ public class Ball {
         this.cx = cx;
         this.cy = cy;
         this.radius = radius;
-        this.dx = 20;
+        this.dx = 0;
         this.dy = 0;
     }
 

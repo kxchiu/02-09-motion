@@ -24,7 +24,9 @@ public class DrawingSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     private Bitmap bmp; //image to draw on
 
     private SurfaceHolder mHolder; //the holder we're going to post updates to
+
     private DrawingRunnable mRunnable; //the code htat we'll want to run on a background thread
+    //we will be making our own thread
     private Thread mThread; //the background thread
 
     private Paint redPaint; //drawing variables (pre-defined for speed)
@@ -60,7 +62,7 @@ public class DrawingSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
         //The Ball
         ball = new Ball(100,100,100);
-        ball.dx = 1;
+        //ball.dx = 1;
     }
 
 
@@ -70,6 +72,14 @@ public class DrawingSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     public void update(){
 
         ball.cx += ball.dx; //move
+        ball.cy += ball.dy;
+
+        //slow down
+        ball.dx *= 0.95;
+        ball.dy *= 0.95;
+
+        //if(ball.dx < 1) ball.dx = 0;
+        //if(ball.dy < 1) ball.dy = 0;
 
         /* hit detection */
         if(ball.cx + ball.radius > viewWidth) { //left bound
@@ -85,6 +95,7 @@ public class DrawingSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         }
         else if(ball.cy - ball.radius < 0) { //top bound
             ball.cy = ball.radius;
+            ball.dy *= -1;
         }
     }
 
@@ -102,6 +113,7 @@ public class DrawingSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     }
 
 
+    //when our surface is first created
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         // create thread only; it's started in surfaceCreated()
@@ -112,6 +124,7 @@ public class DrawingSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
     }
 
+    //when the dimension of the surface is changed
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         synchronized (mHolder) { //synchronized to keep this stuff atomic
@@ -124,12 +137,15 @@ public class DrawingSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         }
     }
 
+    //when our surface goes away (invisible, stopped, or paused), stop the thread
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         // we have to tell thread to shut down & wait for it to finish, or else
         // it might touch the Surface after we return and explode
         mRunnable.setRunning(false); //turn off
         boolean retry = true;
+
+        //repetitively try to stop the thread until it's stopped
         while(retry) {
             try {
                 mThread.join();
@@ -158,13 +174,14 @@ public class DrawingSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
         public void run() {
             Canvas canvas;
+            //infinite loop
             while(isRunning)
             {
                 canvas = null;
                 try {
                     canvas = mHolder.lockCanvas(); //grab the current canvas
                     synchronized (mHolder) {
-                        update(); //update the game
+                        //update(); //update the game (do the animation)
                         render(canvas); //redraw the screen
                     }
                 }

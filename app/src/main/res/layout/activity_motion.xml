@@ -5,7 +5,9 @@
     android:layout_height="match_parent"
     tools:context=".MotionActivity">
 
-    <view class="edu.uw.motiondemo.DrawingView"
+    <!--set the custom view to load in;
+    change "class" to change the view to load-->
+    <view class="edu.uw.motiondemo.DrawingSurfaceView"
         android:id="@+id/drawingView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

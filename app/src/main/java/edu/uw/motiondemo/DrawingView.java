@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 /**
@@ -72,17 +73,28 @@ public class DrawingView extends View {
     {
         super.onDraw(canvas); //make sure to have the parent do any drawing it is supposed to!
 
+        ball.cy += 3;
+
         canvas.drawColor(Color.BLACK); //black out the background
 
+        //red ball
         canvas.drawCircle(ball.cx, ball.cy, ball.radius, redPaint); //we can draw directly onto the canvas
 
+        //draw 5 blue lines of width 1 pixel
         for(int x=50; x<viewWidth-50; x++) { //most of the width
             for(int y=100; y<110; y++) { //10 pixels high
                 bmp.setPixel(x, y, Color.BLUE); //we can also set individual pixels in a Bitmap (like a BufferedImage)
             }
         }
         canvas.drawBitmap(bmp, 0, 0, null); //and then draw the BitMap onto the canvas.
+        /*
+         * Each of these images are seem as one frame.
+         * To draw in animation, we have to be able to tell the canvas to redraw itself.
+         */
         //Canvas bmc = new Canvas(bmp); //we can also make a canvas out of a Bitmap to draw on that (like fetching g2d from a BufferedImage)
+
+        //tells the canvas to redraw
+        invalidate();
     }
 
 }
